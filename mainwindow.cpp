@@ -1,8 +1,8 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "traffic_engine.h"
 
-#include <QApplication>
 #include <QWidget>
 #include <QFrame>
 #include <QLabel>
@@ -10,10 +10,9 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>
-#include <QFont>
-#include <QGraphicsDropShadowEffect>
-#include <QSizePolicy>
-#include <QSpacerItem>
+#include <QTimer>
+#include <QRandomGenerator>
+#include <QString>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("Smart Traffic Control System");
     setMinimumSize(1100, 720);
     resize(1400, 850);
+
+    // ================= MAIN WINDOW =================
 
     QWidget *central = new QWidget(this);
     setCentralWidget(central);
@@ -40,10 +41,11 @@ MainWindow::MainWindow(QWidget *parent)
     root->setContentsMargins(0, 0, 0, 0);
     root->setSpacing(0);
 
-    // ---------------- SIDEBAR ----------------
+    // ================= SIDEBAR =================
 
     QFrame *sidebar = new QFrame;
     sidebar->setFixedWidth(230);
+
     sidebar->setStyleSheet(
         "QFrame {"
         "background-color: #111827;"
@@ -56,6 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     sideLayout->setSpacing(12);
 
     QLabel *brand = new QLabel("◈ TRAFFIC");
+
     brand->setStyleSheet(
         "font-size: 24px;"
         "font-weight: 800;"
@@ -65,9 +68,9 @@ MainWindow::MainWindow(QWidget *parent)
         );
 
     QLabel *subtitle = new QLabel("INTELLIGENT MOBILITY");
+
     subtitle->setStyleSheet(
         "font-size: 10px;"
-        "letter-spacing: 2px;"
         "color: #64748B;"
         "border: none;"
         "padding-bottom: 20px;"
@@ -76,15 +79,19 @@ MainWindow::MainWindow(QWidget *parent)
     sideLayout->addWidget(brand);
     sideLayout->addWidget(subtitle);
 
-    auto createNavButton = [](const QString &text, bool active = false)
+    auto createNavButton = [](const QString &text,
+                              bool active = false)
     {
         QPushButton *button = new QPushButton(text);
+
         button->setMinimumHeight(46);
         button->setCursor(Qt::PointingHandCursor);
 
-        QString background = active ? "#12314A" : "transparent";
-        QString foreground = active ? "#38BDF8" : "#94A3B8";
-        QString border = active ? "#0EA5E9" : "transparent";
+        QString background =
+            active ? "#12314A" : "transparent";
+
+        QString foreground =
+            active ? "#38BDF8" : "#94A3B8";
 
         button->setStyleSheet(
             QString(
@@ -92,9 +99,9 @@ MainWindow::MainWindow(QWidget *parent)
                 "text-align: left;"
                 "padding-left: 15px;"
                 "border-radius: 9px;"
-                "border-left: 3px solid %1;"
-                "background-color: %2;"
-                "color: %3;"
+                "border: none;"
+                "background-color: %1;"
+                "color: %2;"
                 "font-size: 13px;"
                 "font-weight: 600;"
                 "}"
@@ -102,18 +109,29 @@ MainWindow::MainWindow(QWidget *parent)
                 "background-color: #1E293B;"
                 "color: #F8FAFC;"
                 "}"
-                ).arg(border, background, foreground)
+                ).arg(background, foreground)
             );
 
         return button;
     };
 
-    QPushButton *dashboardBtn = createNavButton("  ◈   Dashboard", true);
-    QPushButton *simulationBtn = createNavButton("  ◉   Traffic Simulation");
-    QPushButton *networkBtn = createNavButton("  ⌘   Road Network");
-    QPushButton *routingBtn = createNavButton("  ➤   Emergency Routing");
-    QPushButton *analyticsBtn = createNavButton("  ▥   Analytics");
-    QPushButton *algorithmsBtn = createNavButton("  ⬡   DSA Visualizer");
+    QPushButton *dashboardBtn =
+        createNavButton("  ◈   Dashboard", true);
+
+    QPushButton *simulationBtn =
+        createNavButton("  ◉   Traffic Simulation");
+
+    QPushButton *networkBtn =
+        createNavButton("  ⌘   Road Network");
+
+    QPushButton *routingBtn =
+        createNavButton("  ➤   Emergency Routing");
+
+    QPushButton *analyticsBtn =
+        createNavButton("  ▥   Analytics");
+
+    QPushButton *algorithmsBtn =
+        createNavButton("  ⬡   DSA Visualizer");
 
     sideLayout->addWidget(dashboardBtn);
     sideLayout->addWidget(simulationBtn);
@@ -126,8 +144,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QLabel *systemLabel = new QLabel(
         "SYSTEM STATUS\n\n"
-        "●  Simulation engine ready\n"
-        "●  Road network initialized"
+        "●  C engine initialized\n"
+        "●  Circular queues ready"
         );
 
     systemLabel->setStyleSheet(
@@ -141,8 +159,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     sideLayout->addWidget(systemLabel);
 
-    QLabel *versionLabel = new QLabel("TRAFFIC CORE  •  v1.0");
+    QLabel *versionLabel =
+        new QLabel("TRAFFIC CORE  •  v1.1");
+
     versionLabel->setAlignment(Qt::AlignCenter);
+
     versionLabel->setStyleSheet(
         "color: #475569;"
         "font-size: 10px;"
@@ -154,17 +175,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     root->addWidget(sidebar);
 
-    // ---------------- MAIN CONTENT ----------------
+    // ================= MAIN CONTENT =================
 
     QWidget *content = new QWidget;
 
     QVBoxLayout *contentLayout = new QVBoxLayout(content);
-    contentLayout->setContentsMargins(30, 24, 30, 24);
-    contentLayout->setSpacing(22);
+
+    contentLayout->setContentsMargins(28, 22, 28, 22);
+    contentLayout->setSpacing(18);
 
     root->addWidget(content, 1);
 
-    // ---------------- HEADER ----------------
+    // ================= HEADER =================
 
     QHBoxLayout *header = new QHBoxLayout;
 
@@ -172,6 +194,7 @@ MainWindow::MainWindow(QWidget *parent)
     titleLayout->setSpacing(5);
 
     QLabel *pageTitle = new QLabel("Traffic Overview");
+
     pageTitle->setStyleSheet(
         "font-size: 28px;"
         "font-weight: 800;"
@@ -196,8 +219,10 @@ MainWindow::MainWindow(QWidget *parent)
     header->addStretch();
 
     QLabel *liveBadge = new QLabel("●  SYSTEM ONLINE");
+
     liveBadge->setAlignment(Qt::AlignCenter);
     liveBadge->setMinimumHeight(38);
+
     liveBadge->setStyleSheet(
         "background-color: #12352E;"
         "color: #34D399;"
@@ -212,18 +237,35 @@ MainWindow::MainWindow(QWidget *parent)
 
     contentLayout->addLayout(header);
 
-    // ---------------- STATISTICS CARDS ----------------
+    // ================= TRAFFIC ENGINE =================
+    for (int i = 0; i < MAX_LANES; ++i) {
+        queueInit(&lanes[i]);
+    }
+
+    tick = 0;
+    nextVehicleId = 1;
+
+    totalWaitTime = 0;
+    completedVehicles = 0;
+
+    verticalGreen = true;
+
+    // ================= STATISTICS CARDS =================
 
     QGridLayout *statsGrid = new QGridLayout;
-    statsGrid->setSpacing(15);
+    statsGrid->setSpacing(14);
 
-    auto createStatCard = [](const QString &title,
-                             const QString &value,
-                             const QString &description,
-                             const QString &accent)
+    auto createStatCard =
+        [](const QString &title,
+           const QString &value,
+           const QString &description,
+           const QString &accent,
+           QLabel **valueLabel)
     {
         QFrame *card = new QFrame;
-        card->setMinimumHeight(125);
+
+        card->setMinimumHeight(120);
+
         card->setStyleSheet(
             "QFrame {"
             "background-color: #111827;"
@@ -233,27 +275,35 @@ MainWindow::MainWindow(QWidget *parent)
             );
 
         QVBoxLayout *layout = new QVBoxLayout(card);
-        layout->setContentsMargins(17, 14, 17, 14);
+
+        layout->setContentsMargins(15, 12, 15, 12);
         layout->setSpacing(5);
 
         QLabel *heading = new QLabel(title);
+
         heading->setStyleSheet(
             "color: #94A3B8;"
-            "font-size: 12px;"
+            "font-size: 11px;"
             "border: none;"
             );
 
         QLabel *number = new QLabel(value);
+
+        if (valueLabel != nullptr) {
+            *valueLabel = number;
+        }
+
         number->setStyleSheet(
             QString(
                 "color: %1;"
-                "font-size: 27px;"
+                "font-size: 26px;"
                 "font-weight: 800;"
                 "border: none;"
                 ).arg(accent)
             );
 
         QLabel *detail = new QLabel(description);
+
         detail->setStyleSheet(
             "color: #64748B;"
             "font-size: 10px;"
@@ -268,35 +318,57 @@ MainWindow::MainWindow(QWidget *parent)
     };
 
     statsGrid->addWidget(
-        createStatCard("ACTIVE VEHICLES", "0",
-                       "Waiting for simulation", "#38BDF8"),
+        createStatCard(
+            "ACTIVE VEHICLES",
+            "0",
+            "Vehicles in queues",
+            "#38BDF8",
+            &activeVehiclesValue
+            ),
         0, 0
         );
 
     statsGrid->addWidget(
-        createStatCard("AVG. WAIT TIME", "0 s",
-                       "No simulation data yet", "#A78BFA"),
+        createStatCard(
+            "AVG. WAIT TIME",
+            "0 s",
+            "Waiting vehicles",
+            "#A78BFA",
+            &avgWaitValue
+            ),
         0, 1
         );
 
     statsGrid->addWidget(
-        createStatCard("CONGESTION", "0%",
-                       "Awaiting traffic analysis", "#FBBF24"),
+        createStatCard(
+            "CONGESTION",
+            "0%",
+            "Queue occupancy estimate",
+            "#FBBF24",
+            &congestionValue
+            ),
         0, 2
         );
 
     statsGrid->addWidget(
-        createStatCard("EMERGENCIES", "0",
-                       "No active emergency", "#FB7185"),
+        createStatCard(
+            "EMERGENCIES",
+            "0",
+            "Emergency vehicles waiting",
+            "#FB7185",
+            &emergenciesValue
+            ),
         0, 3
         );
 
     contentLayout->addLayout(statsGrid);
 
-    // ---------------- INTERSECTION PANEL ----------------
+    // ================= INTERSECTION PANEL =================
 
     QFrame *intersectionPanel = new QFrame;
-    intersectionPanel->setMinimumHeight(300);
+
+    intersectionPanel->setMinimumHeight(280);
+
     intersectionPanel->setSizePolicy(
         QSizePolicy::Expanding,
         QSizePolicy::Expanding
@@ -313,10 +385,14 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout *intersectionLayout =
         new QVBoxLayout(intersectionPanel);
 
-    intersectionLayout->setContentsMargins(20, 16, 20, 20);
-    intersectionLayout->setSpacing(12);
+    intersectionLayout->setContentsMargins(
+        18, 14, 18, 16
+        );
 
-    QHBoxLayout *intersectionHeader = new QHBoxLayout;
+    intersectionLayout->setSpacing(10);
+
+    QHBoxLayout *intersectionHeader =
+        new QHBoxLayout;
 
     QLabel *intersectionTitle =
         new QLabel("INTERSECTION CONTROL");
@@ -324,15 +400,12 @@ MainWindow::MainWindow(QWidget *parent)
     intersectionTitle->setStyleSheet(
         "font-size: 13px;"
         "font-weight: 800;"
-        "letter-spacing: 1px;"
         "color: #E2E8F0;"
         "border: none;"
         );
 
     QLabel *simulationStatus =
         new QLabel("●  SIMULATION STOPPED");
-
-    simulationStatus->setObjectName("simulationStatus");
 
     simulationStatus->setStyleSheet(
         "color: #FBBF24;"
@@ -348,7 +421,9 @@ MainWindow::MainWindow(QWidget *parent)
     intersectionLayout->addLayout(intersectionHeader);
 
     QFrame *roadCanvas = new QFrame;
-    roadCanvas->setMinimumHeight(175);
+
+    roadCanvas->setMinimumHeight(170);
+
     roadCanvas->setStyleSheet(
         "background-color: #0B1220;"
         "border: 1px solid #263349;"
@@ -356,32 +431,40 @@ MainWindow::MainWindow(QWidget *parent)
         );
 
     QGridLayout *roadGrid = new QGridLayout(roadCanvas);
+
     roadGrid->setContentsMargins(10, 10, 10, 10);
-    roadGrid->setSpacing(0);
+    roadGrid->setSpacing(5);
 
     auto makeRoadLabel = [](const QString &text)
     {
         QLabel *label = new QLabel(text);
+
         label->setAlignment(Qt::AlignCenter);
+
         label->setStyleSheet(
             "background-color: #273244;"
             "color: #E2E8F0;"
             "border: 1px solid #3A4A60;"
+            "border-radius: 5px;"
             "padding: 10px;"
             "font-size: 11px;"
             "font-weight: 700;"
             );
+
         return label;
     };
 
-    QLabel *northRoad = makeRoadLabel("NORTH  ↑");
-    QLabel *southRoad = makeRoadLabel("SOUTH  ↓");
-    QLabel *westRoad  = makeRoadLabel("←  WEST");
-    QLabel *eastRoad  = makeRoadLabel("EAST  →");
+    QLabel *northRoad = makeRoadLabel("NORTH  ↑  RED");
+    QLabel *southRoad = makeRoadLabel("SOUTH  ↓  RED");
+    QLabel *westRoad = makeRoadLabel("←  WEST  RED");
+    QLabel *eastRoad = makeRoadLabel("EAST  →  RED");
 
-    QLabel *intersection = new QLabel("TRAFFIC\nINTERSECTION");
+    QLabel *intersection =
+        new QLabel("TRAFFIC\nINTERSECTION");
+
     intersection->setAlignment(Qt::AlignCenter);
-    intersection->setMinimumSize(130, 90);
+    intersection->setMinimumSize(120, 85);
+
     intersection->setStyleSheet(
         "background-color: #334155;"
         "color: #38BDF8;"
@@ -401,14 +484,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     contentLayout->addWidget(intersectionPanel, 1);
 
-    // ---------------- SIMULATION CONTROLS ----------------
+    // ================= SIMULATION CONTROLS =================
 
     QHBoxLayout *controls = new QHBoxLayout;
+
     controls->setSpacing(12);
 
-    QLabel *controlHint = new QLabel(
-        "Simulation controls"
-        );
+    QLabel *controlHint =
+        new QLabel("Simulation controls");
 
     controlHint->setStyleSheet(
         "color: #94A3B8;"
@@ -419,11 +502,13 @@ MainWindow::MainWindow(QWidget *parent)
     controls->addWidget(controlHint);
     controls->addStretch();
 
-    auto makeControlButton = [](const QString &text,
-                                const QString &background)
+    auto makeControlButton =
+        [](const QString &text,
+           const QString &background)
     {
         QPushButton *button = new QPushButton(text);
-        button->setMinimumSize(125, 42);
+
+        button->setMinimumSize(115, 42);
         button->setCursor(Qt::PointingHandCursor);
 
         button->setStyleSheet(
@@ -458,48 +543,274 @@ MainWindow::MainWindow(QWidget *parent)
     QPushButton *resetButton =
         makeControlButton("↻  Reset", "#253047");
 
-    startButton->setObjectName("startButton");
-
     controls->addWidget(startButton);
     controls->addWidget(pauseButton);
     controls->addWidget(resetButton);
 
     contentLayout->addLayout(controls);
 
-    // ---------------- BASIC SIMULATION STATE ----------------
+    // ================= SIMULATION TIMER =================
+
+    simulationTimer = new QTimer(this);
+
+    simulationTimer->setInterval(1000);
 
     auto setSimulationStatus =
         [simulationStatus](const QString &text,
                            const QString &color)
     {
         simulationStatus->setText(text);
-            simulationStatus->setStyleSheet(
-                QString(
-                    "color: %1;"
-                    "font-size: 10px;"
-                    "font-weight: 700;"
-                    "border: none;"
-                    ).arg(color)
+
+        simulationStatus->setStyleSheet(
+            QString(
+                "color: %1;"
+                "font-size: 10px;"
+                "font-weight: 700;"
+                "border: none;"
+                ).arg(color)
+            );
+    };
+
+    auto setRoadSignal =
+        [](QLabel *road,
+           const QString &direction,
+           bool green)
+    {
+        QString state = green ? "GREEN" : "RED";
+
+        road->setText(direction + "  " + state);
+
+        road->setStyleSheet(
+            QString(
+                "background-color: %1;"
+                "color: #F8FAFC;"
+                "border: 1px solid %2;"
+                "border-radius: 5px;"
+                "padding: 10px;"
+                "font-size: 11px;"
+                "font-weight: 700;"
+                ).arg(
+                    green ? "#065F46" : "#7F1D1D",
+                    green ? "#10B981" : "#EF4444"
+                    )
+            );
+    };
+
+    auto updateStatistics = [&]()
+    {
+        int totalVehicles = 0;
+        int emergencyVehicles = 0;
+        long long waitingTime = 0;
+
+        for (int lane = 0; lane < MAX_LANES; ++lane) {
+
+            totalVehicles += queueSize(&lanes[lane]);
+
+            for (int j = 0; j < lanes[lane].count; ++j) {
+
+                int index =
+                    (lanes[lane].front + j) % MAX_VEHICLES;
+
+                const Vehicle &vehicle =
+                    lanes[lane].items[index];
+
+                waitingTime += vehicle.waitTime;
+
+                if (vehicle.type == VEHICLE_AMBULANCE ||
+                    vehicle.type == VEHICLE_FIRE_TRUCK) {
+                    emergencyVehicles++;
+                }
+            }
+        }
+
+        activeVehiclesValue->setText(
+            QString::number(totalVehicles)
+            );
+
+        double averageWait = 0.0;
+
+        if (totalVehicles > 0) {
+            averageWait =
+                static_cast<double>(waitingTime) /
+                totalVehicles;
+        }
+
+        avgWaitValue->setText(
+            QString::number(averageWait, 'f', 1) + " s"
+            );
+
+        int capacity = MAX_LANES * MAX_VEHICLES;
+
+        int congestion =
+            capacity > 0
+                ? totalVehicles * 100 / capacity
+                : 0;
+
+        congestionValue->setText(
+            QString::number(congestion) + "%"
+            );
+
+        emergenciesValue->setText(
+            QString::number(emergencyVehicles)
+            );
+    };
+
+    // ================= SIMULATION STEP =================
+
+    connect(
+        simulationTimer,
+        &QTimer::timeout,
+        this,
+        [this, northRoad, southRoad, westRoad, eastRoad,
+         updateStatistics, setRoadSignal]()
+        {
+            tick++;
+
+            // Generate vehicles in each lane.
+            for (int lane = 0; lane < MAX_LANES; ++lane) {
+                if (QRandomGenerator::global()->bounded(100) < 35 &&
+                    !queueIsFull(&lanes[lane])) {
+
+                    Vehicle vehicle{};
+
+                    vehicle.id = nextVehicleId++;
+                    vehicle.lane = lane;
+                    vehicle.arrivalTime = tick;
+                    vehicle.waitTime = 0;
+
+                    int type =
+                        QRandomGenerator::global()->bounded(100);
+
+                    if (type < 3) {
+                        vehicle.type = VEHICLE_AMBULANCE;
+                    } else if (type < 5) {
+                        vehicle.type = VEHICLE_FIRE_TRUCK;
+                    } else if (type < 30) {
+                        vehicle.type = VEHICLE_BIKE;
+                    } else if (type < 40) {
+                        vehicle.type = VEHICLE_BUS;
+                    } else {
+                        vehicle.type = VEHICLE_CAR;
+                    }
+
+                    enqueue(&lanes[lane], vehicle);
+                }
+            }
+
+            // Increase waiting time.
+            for (int lane = 0; lane < MAX_LANES; ++lane) {
+                for (int j = 0; j < lanes[lane].count; ++j) {
+                    int index =
+                        (lanes[lane].front + j) % MAX_VEHICLES;
+
+                    lanes[lane].items[index].waitTime++;
+                }
+            }
+
+            // Alternate traffic signal phases.
+            verticalGreen = (tick % 10) < 5;
+
+            setRoadSignal(northRoad, "NORTH ↑", verticalGreen);
+            setRoadSignal(southRoad, "SOUTH ↓", verticalGreen);
+            setRoadSignal(westRoad, "← WEST", !verticalGreen);
+            setRoadSignal(eastRoad, "EAST →", !verticalGreen);
+
+            // Serve one vehicle from each green lane.
+            for (int lane = 0; lane < MAX_LANES; ++lane) {
+                bool laneIsGreen =
+                    verticalGreen
+                        ? (lane == 0 || lane == 2)
+                        : (lane == 1 || lane == 3);
+
+                if (laneIsGreen && !queueIsEmpty(&lanes[lane])) {
+                    Vehicle vehicle{};
+
+                    if (dequeue(&lanes[lane], &vehicle)) {
+                        totalWaitTime += vehicle.waitTime;
+                        completedVehicles++;
+                    }
+                }
+            }
+
+            updateStatistics();
+        });
+    // ================= BUTTON CONNECTIONS =================
+
+    connect(
+        startButton,
+        &QPushButton::clicked,
+        this,
+        [this, setSimulationStatus]()
+        {
+            if (this->simulationTimer != nullptr &&
+                !this->simulationTimer->isActive()) {
+                this->simulationTimer->start();
+            }
+
+            setSimulationStatus(
+                "●  SIMULATION RUNNING",
+                "#34D399"
                 );
-        };
+        }
+        );
 
-    connect(startButton, &QPushButton::clicked, this,
-            [setSimulationStatus]()
-            {
-                setSimulationStatus("●  SIMULATION RUNNING", "#34D399");
-            });
+    connect(
+        pauseButton,
+        &QPushButton::clicked,
+        this,
+        [this, setSimulationStatus]()
+        {
+            if (this->simulationTimer != nullptr) {
+                this->simulationTimer->stop();
+            }
 
-    connect(pauseButton, &QPushButton::clicked, this,
-            [setSimulationStatus]()
-            {
-                setSimulationStatus("Ⅱ  SIMULATION PAUSED", "#FBBF24");
-            });
+            setSimulationStatus(
+                "Ⅱ  SIMULATION PAUSED",
+                "#FBBF24"
+                );
+        }
+        );
 
-    connect(resetButton, &QPushButton::clicked, this,
-            [setSimulationStatus]()
-            {
-                setSimulationStatus("●  SIMULATION STOPPED", "#FBBF24");
-            });
+    connect(
+        resetButton,
+        &QPushButton::clicked,
+        this,
+        [this, northRoad, southRoad, westRoad, eastRoad,
+         setSimulationStatus, setRoadSignal, updateStatistics]()
+        {
+            if (this->simulationTimer != nullptr) {
+                this->simulationTimer->stop();
+            }
+
+            for (int lane = 0; lane < MAX_LANES; ++lane) {
+                queueInit(&lanes[lane]);
+            }
+
+            tick = 0;
+            nextVehicleId = 1;
+            totalWaitTime = 0;
+            completedVehicles = 0;
+            verticalGreen = true;
+
+            setRoadSignal(northRoad, "NORTH ↑", true);
+            setRoadSignal(southRoad, "SOUTH ↓", true);
+            setRoadSignal(westRoad, "← WEST", false);
+            setRoadSignal(eastRoad, "EAST →", false);
+
+            updateStatistics();
+
+            setSimulationStatus(
+                "●  SIMULATION STOPPED",
+                "#FBBF24"
+                );
+        }
+        );
+
+    // Initialize display.
+    updateStatistics();
+
+    // Initialize display.
+    updateStatistics();
 }
 
 MainWindow::~MainWindow()

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(SmartTrafficFlowControlSystem VERSION 0.1 LANGUAGES CXX)
+project(SmartTrafficFlowControlSystem VERSION 0.1 LANGUAGES C CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -17,6 +17,8 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        traffic_engine.c
+        traffic_engine.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
