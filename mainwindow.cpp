@@ -481,6 +481,11 @@ MainWindow::MainWindow(QWidget *parent)
     roadGrid->addWidget(southRoad, 2, 1);
 
     intersectionLayout->addWidget(roadCanvas, 1);
+    // NEW: Add animated vehicle intersection
+    roadCanvas->hide();
+
+    vehicleWidget = new VehicleWidget(intersectionPanel);
+    intersectionLayout->addWidget(vehicleWidget, 1);
 
     contentLayout->addWidget(intersectionPanel, 1);
 
@@ -654,6 +659,16 @@ MainWindow::MainWindow(QWidget *parent)
             QString::number(emergencyVehicles)
             );
     };
+    // NEW: Synchronize vehicle signals with traffic engine
+    connect(
+        simulationTimer,
+        &QTimer::timeout,
+        this,
+        [this]()
+        {
+            vehicleWidget->setTrafficSignals(verticalGreen);
+        }
+        );
 
     // ================= SIMULATION STEP =================
 
@@ -753,6 +768,16 @@ MainWindow::MainWindow(QWidget *parent)
                 );
         }
         );
+    // NEW: Start vehicle animation
+    connect(
+        startButton,
+        &QPushButton::clicked,
+        this,
+        [this]()
+        {
+            vehicleWidget->startAnimation();
+        }
+        );
 
     connect(
         pauseButton,
@@ -768,6 +793,16 @@ MainWindow::MainWindow(QWidget *parent)
                 "Ⅱ  SIMULATION PAUSED",
                 "#FBBF24"
                 );
+        }
+        );
+    // NEW: Pause vehicle animation
+    connect(
+        pauseButton,
+        &QPushButton::clicked,
+        this,
+        [this]()
+        {
+            vehicleWidget->pauseAnimation();
         }
         );
 
@@ -803,6 +838,18 @@ MainWindow::MainWindow(QWidget *parent)
                 "●  SIMULATION STOPPED",
                 "#FBBF24"
                 );
+        }
+        );
+    // NEW: Reset vehicle animation
+    connect(
+        resetButton,
+        &QPushButton::clicked,
+        this,
+        [this]()
+        {
+            vehicleWidget->pauseAnimation();
+            vehicleWidget->resetVehicles();
+            vehicleWidget->setTrafficSignals(true);
         }
         );
 

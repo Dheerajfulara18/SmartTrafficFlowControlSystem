@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "traffic_engine.h"
+#include "vehiclewidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -37,6 +38,9 @@ private:
 
     // Simulation timer
     QTimer *simulationTimer = nullptr;
+
+    // Vehicle animation widget
+    VehicleWidget *vehicleWidget = nullptr;
 
     // Dashboard statistics
     QLabel *activeVehiclesValue = nullptr;
