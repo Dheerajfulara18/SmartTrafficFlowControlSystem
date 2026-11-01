@@ -659,16 +659,7 @@ MainWindow::MainWindow(QWidget *parent)
             QString::number(emergencyVehicles)
             );
     };
-    // NEW: Synchronize vehicle signals with traffic engine
-    connect(
-        simulationTimer,
-        &QTimer::timeout,
-        this,
-        [this]()
-        {
-            vehicleWidget->setTrafficSignals(verticalGreen);
-        }
-        );
+
 
     // ================= SIMULATION STEP =================
 
@@ -680,6 +671,27 @@ MainWindow::MainWindow(QWidget *parent)
          updateStatistics, setRoadSignal]()
         {
             tick++;
+            // Four-phase traffic signal controller
+            int phaseTime = (tick - 1) % 14;
+
+            int currentPhase;
+
+            if (phaseTime < 5) {
+                currentPhase = 0;
+            }
+            else if (phaseTime < 7) {
+                currentPhase = 1;
+            }
+            else if (phaseTime < 12) {
+                currentPhase = 2;
+            }
+            else {
+                currentPhase = 3;
+            }
+
+            vehicleWidget->setSignalPhase(currentPhase);
+
+            verticalGreen = (currentPhase == 0);
 
             // Generate vehicles in each lane.
             for (int lane = 0; lane < MAX_LANES; ++lane) {
@@ -722,20 +734,24 @@ MainWindow::MainWindow(QWidget *parent)
                 }
             }
 
-            // Alternate traffic signal phases.
-            verticalGreen = (tick % 10) < 5;
+            // Update road signal indicators
+            bool horizontalGreen = (currentPhase == 2);
 
-            setRoadSignal(northRoad, "NORTH ↑", verticalGreen);
-            setRoadSignal(southRoad, "SOUTH ↓", verticalGreen);
-            setRoadSignal(westRoad, "← WEST", !verticalGreen);
-            setRoadSignal(eastRoad, "EAST →", !verticalGreen);
+            setRoadSignal(northRoad, "NORTH ↑", currentPhase == 0);
+            setRoadSignal(southRoad, "SOUTH ↓", currentPhase == 0);
+            setRoadSignal(westRoad, "← WEST", horizontalGreen);
+            setRoadSignal(eastRoad, "EAST →", horizontalGreen);
 
             // Serve one vehicle from each green lane.
             for (int lane = 0; lane < MAX_LANES; ++lane) {
-                bool laneIsGreen =
-                    verticalGreen
-                        ? (lane == 0 || lane == 2)
-                        : (lane == 1 || lane == 3);
+                bool laneIsGreen = false;
+
+                if (currentPhase == 0) {
+                    laneIsGreen = (lane == 0 || lane == 2);
+                }
+                else if (currentPhase == 2) {
+                    laneIsGreen = (lane == 1 || lane == 3);
+                }
 
                 if (laneIsGreen && !queueIsEmpty(&lanes[lane])) {
                     Vehicle vehicle{};
@@ -849,7 +865,7 @@ MainWindow::MainWindow(QWidget *parent)
         {
             vehicleWidget->pauseAnimation();
             vehicleWidget->resetVehicles();
-            vehicleWidget->setTrafficSignals(true);
+            vehicleWidget->setSignalPhase(0);
         }
         );
 

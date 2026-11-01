@@ -23,7 +23,7 @@ class VehicleWidget : public QWidget
 public:
     explicit VehicleWidget(QWidget *parent = nullptr);
 
-    void setTrafficSignals(bool verticalGreen);
+    void setSignalPhase(int phase);
     void resetVehicles();
     void startAnimation();
     void pauseAnimation();
@@ -38,11 +38,20 @@ private:
     QTimer *animationTimer;
     QVector<MovingVehicle> vehicles;
 
-    bool verticalGreen;
+    int signalPhase = 0;
+    bool yellowVisible = true;
+    int blinkCounter = 0;
 
     void generateVehicle();
     void drawVehicle(QPainter &painter,
                      const MovingVehicle &vehicle);
+    // 2.5D Environment Drawing Functions
+    void drawBackground(QPainter &painter);
+    void drawRoads(QPainter &painter);
+    void drawSidewalks(QPainter &painter);
+    void drawRoadMarkings(QPainter &painter);
+    void drawStreetElements(QPainter &painter);
+    void drawVehicles(QPainter &painter);
 };
 
 #endif // VEHICLEWIDGET_H
