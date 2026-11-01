@@ -175,61 +175,311 @@ void VehicleWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    painter.setBrush(QColor("#0B1220"));
-    painter.drawRect(rect());
+    int w = width();
+    int h = height();
 
-    painter.setPen(QPen(QColor("#64748B"), 2));
+    int centerX = w / 2;
+    int centerY = h / 2;
 
-    int centerX = width() / 2;
-    int centerY = height() / 2;
+    // =================================
+    // 1. BACKGROUND - CITY GROUND
+    // =================================
 
-    painter.setBrush(QColor("#263449"));
+    painter.fillRect(rect(), QColor("#172B27"));
+
+    // Ground texture
+    painter.setPen(QPen(QColor("#203A32"), 1));
+
+    for (int x = 0; x < w; x += 35) {
+        for (int y = 0; y < h; y += 35) {
+            painter.drawPoint(x, y);
+        }
+    }
+
+    // =================================
+    // 2. ROAD SHADOW
+    // =================================
+
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(0, 0, 0, 90));
 
     painter.drawRect(
-        centerX - 55,
-        0,
-        110,
-        height()
+        centerX - 87 + 5,
+        5,
+        174,
+        h - 10
         );
 
     painter.drawRect(
+        5,
+        centerY - 87 + 5,
+        w - 10,
+        174
+        );
+
+    // =================================
+    // 3. MAIN ASPHALT ROAD
+    // =================================
+
+    QLinearGradient roadGradient(
+        0, 0, w, h
+        );
+
+    roadGradient.setColorAt(0, QColor("#343C49"));
+    roadGradient.setColorAt(0.5, QColor("#252E3A"));
+    roadGradient.setColorAt(1, QColor("#343C49"));
+
+    painter.setBrush(roadGradient);
+    painter.setPen(Qt::NoPen);
+
+    // Vertical road
+    painter.drawRect(
+        centerX - 82,
         0,
-        centerY - 55,
-        width(),
-        110
+        164,
+        h
         );
 
-    painter.setPen(QPen(Qt::white, 2, Qt::DashLine));
-
-    painter.drawLine(
-        centerX,
+    // Horizontal road
+    painter.drawRect(
         0,
-        centerX,
-        centerY - 55
+        centerY - 82,
+        w,
+        164
+        );
+
+    // =================================
+    // 4. ROAD EDGES
+    // =================================
+
+    painter.setPen(QPen(QColor("#64748B"), 3));
+
+    painter.drawLine(
+        centerX - 82, 0,
+        centerX - 82, h
         );
 
     painter.drawLine(
-        centerX,
-        centerY + 55,
-        centerX,
-        height()
+        centerX + 82, 0,
+        centerX + 82, h
         );
 
     painter.drawLine(
-        0,
-        centerY,
-        centerX - 55,
-        centerY
+        0, centerY - 82,
+        w, centerY - 82
         );
 
     painter.drawLine(
-        centerX + 55,
-        centerY,
-        width(),
-        centerY
+        0, centerY + 82,
+        w, centerY + 82
         );
 
-    for (const MovingVehicle &vehicle : vehicles)
+    // =================================
+    // 5. SIDEWALK / CURB DETAILS
+    // =================================
+
+    painter.setPen(QPen(QColor("#94A3B8"), 4));
+
+    painter.drawLine(
+        centerX - 82, 0,
+        centerX - 82, h
+        );
+
+    painter.drawLine(
+        centerX + 82, 0,
+        centerX + 82, h
+        );
+
+    painter.drawLine(
+        0, centerY - 82,
+        w, centerY - 82
+        );
+
+    painter.drawLine(
+        0, centerY + 82,
+        w, centerY + 82
+        );
+
+    // =================================
+    // 6. LANE DIVIDER MARKINGS
+    // =================================
+
+    painter.setPen(
+        QPen(
+            QColor("#CBD5E1"),
+            2,
+            Qt::DashLine
+            )
+        );
+
+    painter.drawLine(
+        centerX, 0,
+        centerX, centerY - 82
+        );
+
+    painter.drawLine(
+        centerX, centerY + 82,
+        centerX, h
+        );
+
+    painter.drawLine(
+        0, centerY,
+        centerX - 82, centerY
+        );
+
+    painter.drawLine(
+        centerX + 82, centerY,
+        w, centerY
+        );
+
+    // =================================
+    // 7. ZEBRA CROSSINGS
+    // =================================
+
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor("#E2E8F0"));
+
+    // North crossing
+    for (int x = centerX - 65; x <= centerX + 50; x += 20) {
+
+        painter.drawRect(
+            x,
+            centerY - 112,
+            12,
+            24
+            );
+    }
+
+    // South crossing
+    for (int x = centerX - 65; x <= centerX + 50; x += 20) {
+
+        painter.drawRect(
+            x,
+            centerY + 88,
+            12,
+            24
+            );
+    }
+
+    // West crossing
+    for (int y = centerY - 65; y <= centerY + 50; y += 20) {
+
+        painter.drawRect(
+            centerX - 112,
+            y,
+            24,
+            12
+            );
+    }
+
+    // East crossing
+    for (int y = centerY - 65; y <= centerY + 50; y += 20) {
+
+        painter.drawRect(
+            centerX + 88,
+            y,
+            24,
+            12
+            );
+    }
+
+    // =================================
+    // 8. STOP LINES
+    // =================================
+
+    painter.setPen(
+        QPen(QColor("#F8FAFC"), 4)
+        );
+
+    // North
+    painter.drawLine(
+        centerX - 75,
+        centerY - 125,
+        centerX + 75,
+        centerY - 125
+        );
+
+    // South
+    painter.drawLine(
+        centerX - 75,
+        centerY + 125,
+        centerX + 75,
+        centerY + 125
+        );
+
+    // West
+    painter.drawLine(
+        centerX - 125,
+        centerY - 75,
+        centerX - 125,
+        centerY + 75
+        );
+
+    // East
+    painter.drawLine(
+        centerX + 125,
+        centerY - 75,
+        centerX + 125,
+        centerY + 75
+        );
+
+    // =================================
+    // 9. CENTRAL INTERSECTION
+    // =================================
+
+    painter.setPen(Qt::NoPen);
+
+    painter.setBrush(QColor("#303B49"));
+
+    painter.drawRoundedRect(
+        QRectF(
+            centerX - 78,
+            centerY - 78,
+            156,
+            156
+            ),
+        5,
+        5
+        );
+
+    // Subtle central road markings
+    painter.setPen(
+        QPen(QColor("#64748B"), 1)
+        );
+
+    painter.drawRect(
+        centerX - 75,
+        centerY - 75,
+        150,
+        150
+        );
+
+    // =================================
+    // 10. ROAD SURFACE DETAILS
+    // =================================
+
+    painter.setPen(
+        QPen(QColor(255, 255, 255, 18), 1)
+        );
+
+    for (int x = 0; x < w; x += 45) {
+
+        painter.drawLine(
+            x,
+            centerY - 78,
+            x + 15,
+            centerY - 78
+            );
+    }
+
+    // =================================
+    // 11. DRAW ALL VEHICLES
+    // =================================
+
+    for (const MovingVehicle &vehicle : vehicles) {
+
         drawVehicle(painter, vehicle);
+    }
 }
