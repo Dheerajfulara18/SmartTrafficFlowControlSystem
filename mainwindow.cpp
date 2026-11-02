@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QRandomGenerator>
 #include <QString>
+#include <QStackedWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -178,13 +179,17 @@ MainWindow::MainWindow(QWidget *parent)
     // ================= MAIN CONTENT =================
 
     QWidget *content = new QWidget;
+    QStackedWidget *pageStack = new QStackedWidget;
 
     QVBoxLayout *contentLayout = new QVBoxLayout(content);
 
     contentLayout->setContentsMargins(28, 22, 28, 22);
     contentLayout->setSpacing(18);
 
-    root->addWidget(content, 1);
+    pageStack->addWidget(content);
+    pageStack->setCurrentWidget(content);
+
+    root->addWidget(pageStack, 1);
 
     // ================= HEADER =================
 
@@ -874,6 +879,111 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Initialize display.
     updateStatistics();
+    // ================= ADDITIONAL PAGES =================
+
+    auto createPage = [](const QString &title,
+                         const QString &description)
+    {
+        QWidget *page = new QWidget;
+
+        QVBoxLayout *layout = new QVBoxLayout(page);
+
+        layout->setContentsMargins(30, 30, 30, 30);
+        layout->setSpacing(15);
+
+        QLabel *heading = new QLabel(title);
+        heading->setStyleSheet(
+            "font-size: 28px;"
+            "font-weight: 800;"
+            "color: #F8FAFC;"
+            "border: none;"
+            );
+
+        QLabel *subtitle = new QLabel(description);
+        subtitle->setStyleSheet(
+            "font-size: 13px;"
+            "color: #94A3B8;"
+            "border: none;"
+            );
+
+        layout->addWidget(heading);
+        layout->addWidget(subtitle);
+        layout->addStretch();
+
+        return page;
+    };
+
+    // Create five pages
+
+    QWidget *simulationPage = createPage(
+        "Traffic Simulation",
+        "Manage and monitor live traffic."
+        );
+
+    QWidget *networkPage = createPage(
+        "Road Network",
+        "Explore roads and connected intersections."
+        );
+
+    QWidget *routingPage = createPage(
+        "Emergency Routing",
+        "Manage emergency vehicles and priority routes."
+        );
+
+    QWidget *analyticsPage = createPage(
+        "Analytics",
+        "Analyze traffic statistics and performance."
+        );
+
+    QWidget *algorithmsPage = createPage(
+        "DSA Visualizer",
+        "Visualize data structures and algorithms."
+        );
+
+    // Add pages to stack
+
+    pageStack->addWidget(simulationPage);
+    pageStack->addWidget(networkPage);
+    pageStack->addWidget(routingPage);
+    pageStack->addWidget(analyticsPage);
+    pageStack->addWidget(algorithmsPage);
+    // ================= PAGE NAVIGATION =================
+
+    // Dashboard
+    connect(dashboardBtn, &QPushButton::clicked, this, [=]()
+            {
+                pageStack->setCurrentWidget(content);
+            });
+
+    // Traffic Simulation
+    connect(simulationBtn, &QPushButton::clicked, this, [=]()
+            {
+                pageStack->setCurrentWidget(simulationPage);
+            });
+
+    // Road Network
+    connect(networkBtn, &QPushButton::clicked, this, [=]()
+            {
+                pageStack->setCurrentWidget(networkPage);
+            });
+
+    // Emergency Routing
+    connect(routingBtn, &QPushButton::clicked, this, [=]()
+            {
+                pageStack->setCurrentWidget(routingPage);
+            });
+
+    // Analytics
+    connect(analyticsBtn, &QPushButton::clicked, this, [=]()
+            {
+                pageStack->setCurrentWidget(analyticsPage);
+            });
+
+    // DSA Visualizer
+    connect(algorithmsBtn, &QPushButton::clicked, this, [=]()
+            {
+                pageStack->setCurrentWidget(algorithmsPage);
+            });
 }
 
 MainWindow::~MainWindow()
