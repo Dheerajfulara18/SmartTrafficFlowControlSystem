@@ -14,6 +14,7 @@
 #include <QRandomGenerator>
 #include <QString>
 #include <QStackedWidget>
+#include <QComboBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -920,10 +921,66 @@ MainWindow::MainWindow(QWidget *parent)
         "Manage and monitor live traffic."
         );
 
-    QWidget *networkPage = createPage(
-        "Road Network",
-        "Explore roads and connected intersections."
+    // ================= ROAD NETWORK PAGE =================
+
+    QWidget *networkPage = new QWidget;
+
+    QVBoxLayout *networkLayout = new QVBoxLayout(networkPage);
+
+    networkLayout->setContentsMargins(25, 25, 25, 25);
+    networkLayout->setSpacing(18);
+
+    // Page Heading
+    QLabel *networkTitle = new QLabel("Road Network");
+
+    networkTitle->setStyleSheet(
+        "font-size: 28px;"
+        "font-weight: 800;"
+        "color: #F8FAFC;"
+        "border: none;"
         );
+
+    QLabel *networkSubtitle = new QLabel(
+        "Explore intersections, roads and shortest routes."
+        );
+
+    networkSubtitle->setStyleSheet(
+        "font-size: 13px;"
+        "color: #94A3B8;"
+        "border: none;"
+        );
+
+    // Road Network Diagram
+    QLabel *networkDiagram = new QLabel;
+
+    networkDiagram->setText(
+        "                 NORTH GATE\n"
+        "                       |\n"
+        "                       |\n"
+        "WEST GATE ---- CENTRAL JUNCTION ---- EAST GATE\n"
+        "                       |\n"
+        "                       |\n"
+        "                 SOUTH GATE"
+        );
+
+    networkDiagram->setAlignment(Qt::AlignCenter);
+
+    networkDiagram->setMinimumHeight(280);
+
+    networkDiagram->setStyleSheet(
+        "background-color: #111827;"
+        "color: #38BDF8;"
+        "font-size: 17px;"
+        "font-weight: 700;"
+        "border: 1px solid #334155;"
+        "border-radius: 12px;"
+        );
+
+    // Add widgets
+    networkLayout->addWidget(networkTitle);
+    networkLayout->addWidget(networkSubtitle);
+    networkLayout->addWidget(networkDiagram);
+    networkLayout->addStretch();
 
     QWidget *routingPage = createPage(
         "Emergency Routing",
