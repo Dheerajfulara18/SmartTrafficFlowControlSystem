@@ -8,8 +8,9 @@
 class QComboBox;
 class QLabel;
 class QPushButton;
-class QPaintEvent;
+class QSpinBox;
 class QPainter;
+class RoadGraphCanvas;
 
 class RoadNetworkWidget : public QWidget
 {
@@ -18,32 +19,49 @@ class RoadNetworkWidget : public QWidget
 public:
     explicit RoadNetworkWidget(QWidget *parent = nullptr);
 
-protected:
-    void paintEvent(QPaintEvent *event) override;
-
 private slots:
     void calculateShortestPath();
+    void addRoad();
 
 private:
     // Graph Data Structure
     QVector<QVector<int>> graph;
 
-    // Node positions for visualization
+    // Node positions
     QVector<QPointF> nodePositions;
 
     // Shortest path
     QVector<int> shortestPath;
 
-    // UI Components
+    // Route selection
     QComboBox *sourceCombo;
     QComboBox *destinationCombo;
 
-    QLabel *resultLabel;
+    // Add road selection
+    QComboBox *addFromCombo;
+    QComboBox *addToCombo;
+    QSpinBox *distanceInput;
+
+    // Buttons
     QPushButton *findRouteButton;
+    QPushButton *addRoadButton;
+
+    // Result
+    QLabel *resultLabel;
+
+    // Graph drawing area
+    RoadGraphCanvas *graphCanvas;
 
     int routeDistance = 0;
 
     void initializeGraph();
+
+    void addRoadToGraph(
+        int source,
+        int destination,
+        int distance
+        );
+
     void drawGraph(QPainter &painter);
 };
 
