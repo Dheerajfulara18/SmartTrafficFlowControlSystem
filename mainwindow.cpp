@@ -15,7 +15,7 @@
 #include <QString>
 #include <QStackedWidget>
 #include <QComboBox>
-
+#include "emergencyroutingwidget.h"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -925,10 +925,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QWidget *networkPage = new RoadNetworkWidget;
 
-    QWidget *routingPage = createPage(
-        "Emergency Routing",
-        "Manage emergency vehicles and priority routes."
-        );
+    QWidget *routingPage = new EmergencyRoutingWidget;
 
     QWidget *analyticsPage = createPage(
         "Analytics",
