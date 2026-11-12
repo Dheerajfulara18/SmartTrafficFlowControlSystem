@@ -15,7 +15,7 @@
 #include <QString>
 #include <QStackedWidget>
 #include <QComboBox>
-#include "emergencyroutingwidget.h"
+#include "dsavisualizerwidget.h"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -120,26 +120,14 @@ MainWindow::MainWindow(QWidget *parent)
     QPushButton *dashboardBtn =
         createNavButton("  ◈   Dashboard", true);
 
-    QPushButton *simulationBtn =
-        createNavButton("  ◉   Traffic Simulation");
-
     QPushButton *networkBtn =
         createNavButton("  ⌘   Road Network");
-
-    QPushButton *routingBtn =
-        createNavButton("  ➤   Emergency Routing");
-
-    QPushButton *analyticsBtn =
-        createNavButton("  ▥   Analytics");
 
     QPushButton *algorithmsBtn =
         createNavButton("  ⬡   DSA Visualizer");
 
     sideLayout->addWidget(dashboardBtn);
-    sideLayout->addWidget(simulationBtn);
     sideLayout->addWidget(networkBtn);
-    sideLayout->addWidget(routingBtn);
-    sideLayout->addWidget(analyticsBtn);
     sideLayout->addWidget(algorithmsBtn);
 
     sideLayout->addStretch();
@@ -916,41 +904,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Create five pages
 
-    QWidget *simulationPage = createPage(
-        "Traffic Simulation",
-        "Manage and monitor live traffic."
-        );
+
 
     // ================= ROAD NETWORK PAGE =================
 
     QWidget *networkPage = new RoadNetworkWidget;
 
-    QWidget *routingPage = new EmergencyRoutingWidget;
-
-    QWidget *analyticsPage = createPage(
-        "Analytics",
-        "Analyze traffic statistics and performance."
-        );
-
-    QWidget *algorithmsPage = createPage(
-        "DSA Visualizer",
-        "Visualize data structures and algorithms."
-        );
+    QWidget *algorithmsPage = new DSAVisualizerWidget;
 
     // Add pages to stack
 
-    pageStack->addWidget(simulationPage);
     pageStack->addWidget(networkPage);
-    pageStack->addWidget(routingPage);
-    pageStack->addWidget(analyticsPage);
-    pageStack->addWidget(algorithmsPage);
-
-    // Add pages to stack
-
-    pageStack->addWidget(simulationPage);
-    pageStack->addWidget(networkPage);
-    pageStack->addWidget(routingPage);
-    pageStack->addWidget(analyticsPage);
     pageStack->addWidget(algorithmsPage);
     // ================= PAGE NAVIGATION =================
 
@@ -960,11 +924,6 @@ MainWindow::MainWindow(QWidget *parent)
                 pageStack->setCurrentWidget(content);
             });
 
-    // Traffic Simulation
-    connect(simulationBtn, &QPushButton::clicked, this, [=]()
-            {
-                pageStack->setCurrentWidget(simulationPage);
-            });
 
     // Road Network
     connect(networkBtn, &QPushButton::clicked, this, [=]()
@@ -972,17 +931,6 @@ MainWindow::MainWindow(QWidget *parent)
                 pageStack->setCurrentWidget(networkPage);
             });
 
-    // Emergency Routing
-    connect(routingBtn, &QPushButton::clicked, this, [=]()
-            {
-                pageStack->setCurrentWidget(routingPage);
-            });
-
-    // Analytics
-    connect(analyticsBtn, &QPushButton::clicked, this, [=]()
-            {
-                pageStack->setCurrentWidget(analyticsPage);
-            });
 
     // DSA Visualizer
     connect(algorithmsBtn, &QPushButton::clicked, this, [=]()
